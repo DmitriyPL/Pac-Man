@@ -10,10 +10,7 @@ GameField::GameField(QWidget *parent) :
     this->resize(900, 900);
     this->setFixedSize(900, 900);
 
-    count = 0;
-
     scene  = new QGraphicsScene();
-    pacman = new PacMan();
 
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
@@ -22,22 +19,13 @@ GameField::GameField(QWidget *parent) :
 
     scene->setBackgroundBrush(Qt::black);
 
-    LoadMap(R"(D:\Qt\GameDev\Pac-Man\map1.txt)");
-    FillMapPoint();
-
-
-    scene->addItem(pacman);
-    pacman->setPos(-16,-36);
-
     timer = new QTimer();
-    connect(timer, &QTimer::timeout, pacman, &PacMan::slotGameTimer);
-    timer->start(1000/80);
 
-//    timerCreatePoints = new QTimer();
-//    connect(timerCreatePoints, &QTimer::timeout, this, &GameField::slotCreatePoint);
-//    timerCreatePoints->start(1000);
+    gameState = GAME_STOPED;
 
-    connect(pacman, &PacMan::signalCheckItem, this, &GameField::slotCheckItem);
+//    pauseKey = new QShortcut(this);
+//    pauseKey->setKey(Qt::Key_Pause);
+//    connect(pauseKey, &QShortcut::activated, this, &GameField::slotPause);
 }
 
 GameField::~GameField()
@@ -101,6 +89,11 @@ void GameField::FillMapPoint()
     }
 }
 
+void GameField::SetWallRepel(int newValue)
+{
+    wallRepel = newValue;
+}
+
 void GameField::slotCheckItem(QGraphicsItem *item)
 {
     foreach (QGraphicsItem *point, points)
@@ -111,6 +104,29 @@ void GameField::slotCheckItem(QGraphicsItem *item)
             points.removeOne(item);
             delete point;
             ui->lcdNumber->display(count++);
+
+            QMediaPlayer   *m_player   = new QMediaPlayer(this);
+            QMediaPlaylist *m_playlist = new QMediaPlaylist(m_player);
+
+            m_player->setPlaylist(m_playlist);
+            m_playlist->addMedia(QUrl("qrc:/pacman_chomp.wav"));
+            m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+
+            m_player->play();
+        }
+
+        if (points.empty())
+        {
+            QMediaPlayer   *m_player   = new QMediaPlayer(this);
+            QMediaPlaylist *m_playlist = new QMediaPlaylist(m_player);
+
+            m_player->setPlaylist(m_playlist);
+            m_playlist->addMedia(QUrl("qrc:/pacman_intermission.wav"));
+            m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+
+            m_player->play();
+
+            emit signalGameOver();
         }
     }
 
@@ -119,16 +135,16 @@ void GameField::slotCheckItem(QGraphicsItem *item)
         if (segment == item)
         {
             if (pacman->GetDir() == right)
-                pacman->setX( pacman->x() - 2 );
+                pacman->setX( pacman->x() - wallRepel );
 
             if (pacman->GetDir() == left)
-                pacman->setX( pacman->x() + 2 );
+                pacman->setX( pacman->x() + wallRepel );
 
             if (pacman->GetDir() == up)
-                pacman->setY( pacman->y() + 2  );
+                pacman->setY( pacman->y() + wallRepel  );
 
             if (pacman->GetDir() == down)
-                pacman->setY( pacman->y() - 2  );
+                pacman->setY( pacman->y() - wallRepel  );
 
         }
     }
@@ -136,16 +152,72 @@ void GameField::slotCheckItem(QGraphicsItem *item)
 
 }
 
-void GameField::slotCreatePoint()
+void GameField::on_pushButton_StartGame_clicked()
 {
-    Points *point = new Points();
+    QMediaPlayer   *m_player   = new QMediaPlayer(this);
+    QMediaPlaylist *m_playlist = new QMediaPlaylist(m_player);
 
-    scene->addItem(point);
+    m_player->setPlaylist(m_playlist);
+    m_playlist->addMedia(QUrl("qrc:/pacman_beginning.wav"));
+    m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+    m_player->play();
 
-    point->setPos( ( qrand() % (251) ) * ( (qrand() % 2 == 1 ) ? 1 : -1 ),
-                   ( qrand() % (251) ) * ( (qrand() % 2 == 1 ) ? 1 : -1 ) );
+    LoadMap(R"(D:\Qt\GameDev\Pac-Man\map1.txt)");
+    FillMapPoint();
+    wallRepel = 1;
 
-    point->setZValue(-1);
+    count = 0;
+    ui->lcdNumber->display(count);
 
-    points.append(point);
+    pacman = new PacMan();
+
+    scene->addItem(pacman);
+    pacman->setPos(-16,-36);
+
+    connect(timer, &QTimer::timeout, pacman, &PacMan::slotGameTimer);
+    timer->start(1000/200);
+
+    connect(pacman, &PacMan   ::signalCheckItem, this, &GameField::slotCheckItem);
+    connect(this  , &GameField::signalGameOver , this, &GameField::slotGameOver);
+
+    ui->pushButton_StartGame->setEnabled(false);
+
+    gameState = GAME_STARTED;
 }
+
+void GameField::slotGameOver()
+{
+    timer->stop();
+    QMessageBox::information(this,
+                         "Game Over", "My respect =)");
+
+    disconnect(pacman, &PacMan   ::signalCheckItem, this, &GameField::slotCheckItem);
+    disconnect(this  , &GameField::signalGameOver , this, &GameField::slotGameOver);
+
+    pacman->deleteLater();
+
+    foreach(QGraphicsItem *point, points)
+    {
+        scene->removeItem(point);
+        points.removeOne(point);
+        delete point;
+    }
+
+    ui->pushButton_StartGame->setEnabled(true);
+
+    gameState = GAME_STARTED;
+
+}
+
+//void GameField::slotPause()
+//{
+//    if (gameState == GAME_STARTED){
+//        if(timer->isActive()){
+//            timer->stop();
+//        } else{
+
+//            timer->start(1000/200);
+//        }
+//    }
+//}
+

@@ -14,6 +14,8 @@ PacMan::PacMan(QObject *parent) :
     angle = 0;
     setRotation(angle);
 
+    pacmanSpeed = 1;
+
     agngleMouthOpening = 1;
     tickForMouthOpening = 0;
 }
@@ -42,7 +44,7 @@ void PacMan::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
     QPolygon mouth;
 
-         if (agngleMouthOpening == 1) { mouth << QPoint(0,0) << QPoint(16 , 10) << QPoint(16 , -10); }
+         if (agngleMouthOpening == 1) { mouth << QPoint(0,0) << QPoint(16 , 13) << QPoint(16 , -13); }
     else if (agngleMouthOpening == 2) { mouth << QPoint(0,0) << QPoint(16 , 10) << QPoint(16 , -10); }
     else if (agngleMouthOpening == 3) { mouth << QPoint(0,0) << QPoint(16 , 8 ) << QPoint(16 , -8 ); }
     else if (agngleMouthOpening == 4) { mouth << QPoint(0,0) << QPoint(16 , 6 ) << QPoint(16 , -6 ); }
@@ -65,21 +67,21 @@ void PacMan::slotGameTimer()
 
     tickForMouthOpening++;
 
-    speedMouthOpening = 4;
+    speedMouthOpening = 5;
 
-    if (tickForMouthOpening == ( 2 + speedMouthOpening ) ){
+    if (tickForMouthOpening == ( 2 * speedMouthOpening ) ){
         agngleMouthOpening = 2;
         update(QRectF(-15, -15, 30, 30));
-    } else if (tickForMouthOpening == ( 4 + speedMouthOpening ) ){
+    } else if (tickForMouthOpening == ( 3 * speedMouthOpening ) ){
         agngleMouthOpening = 3;
         update(QRectF(-15, -15, 30, 30));
-    } else if (tickForMouthOpening == ( 8 + speedMouthOpening ) ){
+    } else if (tickForMouthOpening == ( 4 * speedMouthOpening ) ){
         agngleMouthOpening = 4;
         update(QRectF(-15, -15, 30, 30));
-    } else if (tickForMouthOpening == ( 10 + speedMouthOpening ) ){
+    } else if (tickForMouthOpening == ( 5 * speedMouthOpening ) ){
         agngleMouthOpening = 5;
         update(QRectF(-15, -15, 30, 30));
-    } else if (tickForMouthOpening == ( 12 + speedMouthOpening ) ){
+    } else if (tickForMouthOpening == ( 6 * speedMouthOpening ) ){
         agngleMouthOpening = 6;
         update(QRectF(-15, -15, 30, 30));
         tickForMouthOpening = 0;
@@ -87,8 +89,8 @@ void PacMan::slotGameTimer()
 
     foundItems = scene()->items(QPolygonF()
                                 << mapToScene( 0,  0 )
-                                << mapToScene(15,  13)
-                                << mapToScene(15, -13) );
+                                << mapToScene(16,  13)
+                                << mapToScene(16, -13) );
 
     foreach (QGraphicsItem *item, foundItems)
     {
@@ -112,8 +114,8 @@ void PacMan::LeftButton()
 
         if (isPushedLeft)
         {
-            if (dir == right) setPos(mapToParent(-2,0));
-            else setPos(mapToParent(2,0));
+            if (dir == right) setPos(mapToParent(-pacmanSpeed,0));
+            else setPos(mapToParent(pacmanSpeed,0));
         }
         else
         {
@@ -170,7 +172,7 @@ void PacMan::RightButton()
 
         if (isPushedRight)
         {
-            setPos(mapToParent(2,0));
+            setPos(mapToParent(pacmanSpeed,0));
         }
         else
         {
@@ -227,8 +229,8 @@ void PacMan::UpButton()
 
         if (isPushedUp)
         {
-            if (dir == right) setPos(mapToParent(-2,0));
-            else setPos(mapToParent(2,0));
+            if (dir == right) setPos(mapToParent(-pacmanSpeed,0));
+            else setPos(mapToParent(pacmanSpeed,0));
         }
         else
         {
@@ -286,8 +288,8 @@ void PacMan::DownButton()
 
         if (isPushedDown)
         {
-            if (dir == right) setPos(mapToParent(-2,0));
-            else setPos(mapToParent(2,0));
+            if (dir == right) setPos(mapToParent(-pacmanSpeed,0));
+            else setPos(mapToParent(pacmanSpeed,0));
         }
         else
         {
@@ -335,4 +337,9 @@ void PacMan::DownButton()
 int PacMan::GetDir()
 {
     return dir;
+}
+
+void PacMan::SetPacmanSpeed(int newValue)
+{
+    pacmanSpeed = newValue;
 }

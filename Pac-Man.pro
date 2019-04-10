@@ -1,14 +1,10 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2019-04-07T17:49:26
+# Project created by QtCreator 2019-04-10T21:30:53
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-win32-msvc*{
-  LIBS += -luser32
-}
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -48,3 +44,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    sounds/sounds.qrc

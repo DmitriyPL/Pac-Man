@@ -21,6 +21,7 @@ public:
     void DownButton();
 
     int GetDir();
+    void SetPacmanSpeed(int newValue);
 
 signals:
     void signalCheckItem(QGraphicsItem *item);
@@ -33,6 +34,8 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
+
+    int pacmanSpeed;
 
     qreal angle;
     bool isPushedLeft, isPushedRight, isPushedUp, isPushedDown;
