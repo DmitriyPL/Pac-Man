@@ -3,10 +3,11 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
-#include <QShortcut>
+
 #include <QDebug>
 #include <QTimer>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
@@ -14,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <pconsts.h>
 #include <pacman.h>
 #include <points.h>
 #include <wall.h>
@@ -33,7 +35,8 @@ public:
     explicit GameField(QWidget *parent = nullptr);
     ~GameField();
 
-    void LoadMap(const QString &path);
+    void LoadMap();
+
     void FillMapPoint();
 
     void SetWallRepel(int newValue);
@@ -43,27 +46,23 @@ signals:
     void signalGameOver();
 
 private slots:
-    void slotCheckItem(QGraphicsItem *item);
+    void slotCheckItem(QGraphicsItem *itemy, double x, double y);
 
     void on_pushButton_StartGame_clicked();
 
     void slotGameOver();
-//    void slotPause();
 
 private:
     Ui::GameField *ui;
 
     QGraphicsScene *scene;
+
     PacMan         *pacman;
     Points         *point;
     Wall           *wallSegment;
 
     QList<QGraphicsItem * > points;
     QList<QGraphicsItem * > wallSegments;
-
-//    QShortcut *pauseKey;
-
-    enum direction { left = 1, right, up, down };
 
     QTimer *timer;
 
@@ -72,7 +71,5 @@ private:
     int wallRepel;
     int gameState;
 
-//    QMediaPlayer   *m_player;
-    //    QMediaPlaylist *m_playlist;
 };
 #endif // GAMEFIELD_H

@@ -10,6 +10,7 @@ GameField::GameField(QWidget *parent) :
     this->resize(900, 900);
     this->setFixedSize(900, 900);
 
+
     scene  = new QGraphicsScene();
 
     ui->graphicsView->setScene(scene);
@@ -23,9 +24,6 @@ GameField::GameField(QWidget *parent) :
 
     gameState = GAME_STOPED;
 
-//    pauseKey = new QShortcut(this);
-//    pauseKey->setKey(Qt::Key_Pause);
-//    connect(pauseKey, &QShortcut::activated, this, &GameField::slotPause);
 }
 
 GameField::~GameField()
@@ -33,20 +31,22 @@ GameField::~GameField()
     delete ui;
 }
 
-void GameField::LoadMap(const QString &path)
+void GameField::LoadMap()
 {
-    std::ifstream fileMap;
-    fileMap.open(path.toStdString(), std::ios_base::out);
+    QFile fileMap(":/sources/map1.txt");
 
-    if ( !fileMap.is_open() ) qDebug() << " Map doesn't loaded! ";
+    if ( !fileMap.open(QFile::ReadOnly | QFile::Text) )
+        qDebug() << " Map doesn't loaded! ";
 
     char symbol;
+
+    QTextStream readStream(&fileMap);
 
     for (int i = 1; i <= 21; i++)
     {
         for (int j = 1; j <= 38; j++)
         {
-            fileMap.get(symbol);
+            readStream >> symbol;
 
             if (symbol == '*' )
             {
@@ -94,7 +94,7 @@ void GameField::SetWallRepel(int newValue)
     wallRepel = newValue;
 }
 
-void GameField::slotCheckItem(QGraphicsItem *item)
+void GameField::slotCheckItem(QGraphicsItem *item, double x, double y)
 {
     foreach (QGraphicsItem *point, points)
     {
@@ -109,7 +109,7 @@ void GameField::slotCheckItem(QGraphicsItem *item)
             QMediaPlaylist *m_playlist = new QMediaPlaylist(m_player);
 
             m_player->setPlaylist(m_playlist);
-            m_playlist->addMedia(QUrl("qrc:/pacman_chomp.wav"));
+            m_playlist->addMedia(QUrl("qrc:/sources/pacman_eatfruit.wav"));
             m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
 
             m_player->play();
@@ -121,7 +121,7 @@ void GameField::slotCheckItem(QGraphicsItem *item)
             QMediaPlaylist *m_playlist = new QMediaPlaylist(m_player);
 
             m_player->setPlaylist(m_playlist);
-            m_playlist->addMedia(QUrl("qrc:/pacman_intermission.wav"));
+            m_playlist->addMedia(QUrl("qrc:/sources/pacman_intermission.wav"));
             m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
 
             m_player->play();
@@ -134,21 +134,29 @@ void GameField::slotCheckItem(QGraphicsItem *item)
     {
         if (segment == item)
         {
-            if (pacman->GetDir() == right)
-                pacman->setX( pacman->x() - wallRepel );
+            if (pacman->GetDir() == pconsts::direction::RIGHT){
 
-            if (pacman->GetDir() == left)
-                pacman->setX( pacman->x() + wallRepel );
+                pacman->setX( pacman->x() - pacman->GetPacmanSpeed() + wallRepel );
+                if (!pacman->collidingItems().isEmpty()) pacman->setX(x);
+            }
 
-            if (pacman->GetDir() == up)
-                pacman->setY( pacman->y() + wallRepel  );
+            if (pacman->GetDir() == pconsts::direction::LEFT){
 
-            if (pacman->GetDir() == down)
-                pacman->setY( pacman->y() - wallRepel  );
+                pacman->setX( pacman->x() + pacman->GetPacmanSpeed() + wallRepel );
+                if (!pacman->collidingItems().isEmpty()) pacman->setX(x);
+            }
 
+            if (pacman->GetDir() == pconsts::direction::UP){
+                pacman->setY( pacman->y() + pacman->GetPacmanSpeed() + wallRepel  );
+                if (!pacman->collidingItems().isEmpty()) pacman->setY(y);
+            }
+
+            if (pacman->GetDir() == pconsts::direction::DOWN){
+                pacman->setY( pacman->y() - pacman->GetPacmanSpeed() + wallRepel  );
+                if (!pacman->collidingItems().isEmpty()) pacman->setY(y);
+            }
         }
     }
-
 
 }
 
@@ -158,24 +166,27 @@ void GameField::on_pushButton_StartGame_clicked()
     QMediaPlaylist *m_playlist = new QMediaPlaylist(m_player);
 
     m_player->setPlaylist(m_playlist);
-    m_playlist->addMedia(QUrl("qrc:/pacman_beginning.wav"));
+    m_playlist->addMedia(QUrl("qrc:/sources/pacman_beginning.wav"));
     m_playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
     m_player->play();
 
-    LoadMap(R"(D:\Qt\GameDev\Pac-Man\map1.txt)");
+    //LoadMap( R"(D:\Qt\GameDev\Pac-Man\map1.txt)" );
+    LoadMap();
+
     FillMapPoint();
-    wallRepel = 1;
+    wallRepel = 0;
 
     count = 0;
     ui->lcdNumber->display(count);
 
     pacman = new PacMan();
+    this->installEventFilter(pacman);
 
     scene->addItem(pacman);
     pacman->setPos(-16,-36);
 
     connect(timer, &QTimer::timeout, pacman, &PacMan::slotGameTimer);
-    timer->start(1000/200);
+    timer->start(2);
 
     connect(pacman, &PacMan   ::signalCheckItem, this, &GameField::slotCheckItem);
     connect(this  , &GameField::signalGameOver , this, &GameField::slotGameOver);
@@ -188,8 +199,8 @@ void GameField::on_pushButton_StartGame_clicked()
 void GameField::slotGameOver()
 {
     timer->stop();
-    QMessageBox::information(this,
-                         "Game Over", "My respect =)");
+
+    QMessageBox::information(this, "Game Over", "My respect =)");
 
     disconnect(pacman, &PacMan   ::signalCheckItem, this, &GameField::slotCheckItem);
     disconnect(this  , &GameField::signalGameOver , this, &GameField::slotGameOver);
@@ -205,19 +216,6 @@ void GameField::slotGameOver()
 
     ui->pushButton_StartGame->setEnabled(true);
 
-    gameState = GAME_STARTED;
+    gameState = GAME_STOPED;
 
 }
-
-//void GameField::slotPause()
-//{
-//    if (gameState == GAME_STARTED){
-//        if(timer->isActive()){
-//            timer->stop();
-//        } else{
-
-//            timer->start(1000/200);
-//        }
-//    }
-//}
-

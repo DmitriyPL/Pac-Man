@@ -4,17 +4,12 @@ PacMan::PacMan(QObject *parent) :
     QObject (parent),
     QGraphicsItem()
 {
-    isPushedLeft  = false;
-    isPushedRight = false;
-    isPushedUp    = false;
-    isPushedDown  = false;
-
-    dir = right;
+    dir = pconsts::direction::RIGHT;
 
     angle = 0;
     setRotation(angle);
 
-    pacmanSpeed = 1;
+    pacmanSpeed = 5;
 
     agngleMouthOpening = 1;
     tickForMouthOpening = 0;
@@ -22,6 +17,7 @@ PacMan::PacMan(QObject *parent) :
 
 PacMan::~PacMan()
 {}
+
 
 QRectF PacMan::boundingRect() const
 {
@@ -31,43 +27,125 @@ QRectF PacMan::boundingRect() const
 void PacMan::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 
-    painter->setPen(QPen(Qt::yellow));
-    painter->setBrush(Qt::yellow);
+    if (dir == pconsts::direction::RIGHT){
 
-    painter->drawEllipse(-15, -15, 30, 30);
+        painter->setPen(QPen(Qt::yellow));
+        painter->setBrush(Qt::yellow);
 
-    painter->setPen(QPen(Qt::black));
-    painter->setBrush(Qt::black);
+        if ( agngleMouthOpening == 1 ) painter->drawPie(-15, -15, 30, 30, -55 * 16, -250 * 16);
+        if ( agngleMouthOpening == 2 ) painter->drawPie(-15, -15, 30, 30, -45 * 16, -270 * 16);
+        if ( agngleMouthOpening == 3 ) painter->drawPie(-15, -15, 30, 30, -35 * 16, -290 * 16);
+        if ( agngleMouthOpening == 4 ) painter->drawPie(-15, -15, 30, 30, -25 * 16, -310 * 16);
+        if ( agngleMouthOpening == 5 ) painter->drawPie(-15, -15, 30, 30, -15 * 16, -330 * 16);
+        if ( agngleMouthOpening == 6 ) painter->drawPie(-15, -15, 30, 30, -5  * 16, -350 * 16);
 
-    if (dir == left) painter->drawEllipse(3,6,3,3);
-    else painter->drawEllipse(3,-9,3,3);
+        painter->setPen(QPen(Qt::black));
+        painter->setBrush(Qt::black);
 
-    QPolygon mouth;
+        painter->drawEllipse(3,-10,3,3);
+    }
 
-         if (agngleMouthOpening == 1) { mouth << QPoint(0,0) << QPoint(16 , 13) << QPoint(16 , -13); }
-    else if (agngleMouthOpening == 2) { mouth << QPoint(0,0) << QPoint(16 , 10) << QPoint(16 , -10); }
-    else if (agngleMouthOpening == 3) { mouth << QPoint(0,0) << QPoint(16 , 8 ) << QPoint(16 , -8 ); }
-    else if (agngleMouthOpening == 4) { mouth << QPoint(0,0) << QPoint(16 , 6 ) << QPoint(16 , -6 ); }
-    else if (agngleMouthOpening == 5) { mouth << QPoint(0,0) << QPoint(16 , 3 ) << QPoint(16 , -3 ); }
-    else if (agngleMouthOpening == 6) { mouth << QPoint(0,0) << QPoint(16 , 0 ) << QPoint(16 ,  0 ); }
+    if (dir == pconsts::direction::LEFT){
 
-    painter->drawPolygon(mouth);
+        painter->setPen(QPen(Qt::yellow));
+        painter->setBrush(Qt::yellow);
+
+        if ( agngleMouthOpening == 1 ) painter->drawPie(-15, -15, 30, 30, -125 * 16, 250 * 16);
+        if ( agngleMouthOpening == 2 ) painter->drawPie(-15, -15, 30, 30, -135 * 16, 270 * 16);
+        if ( agngleMouthOpening == 3 ) painter->drawPie(-15, -15, 30, 30, -145 * 16, 290 * 16);
+        if ( agngleMouthOpening == 4 ) painter->drawPie(-15, -15, 30, 30, -155 * 16, 310 * 16);
+        if ( agngleMouthOpening == 5 ) painter->drawPie(-15, -15, 30, 30, -165 * 16, 330 * 16);
+        if ( agngleMouthOpening == 6 ) painter->drawPie(-15, -15, 30, 30, -175 * 16, 350 * 16);
+
+        painter->setPen(QPen(Qt::black));
+        painter->setBrush(Qt::black);
+
+        painter->drawEllipse(-6,-10,3,3);
+    }
+
+    if (dir == pconsts::direction::UP){
+
+        painter->setPen(QPen(Qt::yellow));
+        painter->setBrush(Qt::yellow);
+
+            if ( agngleMouthOpening == 1 ) painter->drawPie(-15, -15, 30, 30, 145 * 16, 240 * 16);
+            if ( agngleMouthOpening == 2 ) painter->drawPie(-15, -15, 30, 30, 135 * 16, 260 * 16);
+            if ( agngleMouthOpening == 3 ) painter->drawPie(-15, -15, 30, 30, 125 * 16, 280 * 16);
+            if ( agngleMouthOpening == 4 ) painter->drawPie(-15, -15, 30, 30, 115 * 16, 300 * 16);
+            if ( agngleMouthOpening == 5 ) painter->drawPie(-15, -15, 30, 30, 105 * 16, 330 * 16);
+            if ( agngleMouthOpening == 6 ) painter->drawPie(-15, -15, 30, 30, 95  * 16, 350 * 16);
+
+        painter->setPen(QPen(Qt::black));
+        painter->setBrush(Qt::black);
+
+        painter->drawEllipse(-10,-6,3,3);
+    }
+
+    if (dir == pconsts::direction::DOWN){
+
+        painter->setPen(QPen(Qt::yellow));
+        painter->setBrush(Qt::yellow);
+
+            if ( agngleMouthOpening == 1 ) painter->drawPie(-15, -15, 30, 30, -35 * 16, 240 * 16);
+            if ( agngleMouthOpening == 2 ) painter->drawPie(-15, -15, 30, 30, -45 * 16, 270 * 16);
+            if ( agngleMouthOpening == 3 ) painter->drawPie(-15, -15, 30, 30, -55 * 16, 290 * 16);
+            if ( agngleMouthOpening == 4 ) painter->drawPie(-15, -15, 30, 30, -65 * 16, 310 * 16);
+            if ( agngleMouthOpening == 5 ) painter->drawPie(-15, -15, 30, 30, -75 * 16, 330 * 16);
+            if ( agngleMouthOpening == 6 ) painter->drawPie(-15, -15, 30, 30, -85 * 16, 350 * 16);
+
+        painter->setPen(QPen(Qt::black));
+        painter->setBrush(Qt::black);
+
+        painter->drawEllipse(-10,3,3,3);
+    }
+
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
 
+bool PacMan::eventFilter(QObject *obj, QEvent *event)
+{
+    if ( (event->type() == QEvent::KeyPress) ){
+
+        QKeyEvent *keyEvent = static_cast < QKeyEvent* > ( event );
+
+        switch (keyEvent->key()) {
+
+        case Qt::Key_Right:
+
+            setPos( mapToParent( this->GetPacmanSpeed() , 0 ) );
+            dir = pconsts::direction::RIGHT;
+            return true;
+
+        case Qt::Key_Left:
+
+            setPos( mapToParent( - this->GetPacmanSpeed() , 0 ) );
+            dir = pconsts::direction::LEFT;
+            return true;
+
+        case Qt::Key_Up:
+
+            setPos( mapToParent( 0 , - this->GetPacmanSpeed() ) );
+            dir = pconsts::direction::UP;
+            return true;
+
+        case Qt::Key_Down:
+
+            setPos( mapToParent( 0 , this->GetPacmanSpeed() ) );
+            dir = pconsts::direction::DOWN;
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
+}
+
 void PacMan::slotGameTimer()
 {
-
-    LeftButton();
-    RightButton();
-    UpButton();
-    DownButton();
-
     tickForMouthOpening++;
 
-    speedMouthOpening = 5;
+    speedMouthOpening = 10;
 
     if (tickForMouthOpening == ( 2 * speedMouthOpening ) ){
         agngleMouthOpening = 2;
@@ -87,251 +165,15 @@ void PacMan::slotGameTimer()
         tickForMouthOpening = 0;
     }
 
-    foundItems = scene()->items(QPolygonF()
-                                << mapToScene( 0,  0 )
-                                << mapToScene(16,  13)
-                                << mapToScene(16, -13) );
+    foundItems = this->collidingItems();
 
     foreach (QGraphicsItem *item, foundItems)
     {
-        if (item == this) continue;
-
-        emit signalCheckItem(item);
+        emit signalCheckItem(item, this->x(), this->y());
     }
 
-    if  (this->x() > 597 ) this->setX(-58);
-    if  (this->x() < -58 ) this->setX(597);
-
-}
-
-void PacMan::LeftButton()
-{
-    if(GetAsyncKeyState(VK_LEFT))
-    {
-        isPushedRight = false;
-        isPushedUp    = false;
-        isPushedDown  = false;
-
-        if (isPushedLeft)
-        {
-            if (dir == right) setPos(mapToParent(-pacmanSpeed,0));
-            else setPos(mapToParent(pacmanSpeed,0));
-        }
-        else
-        {
-            switch (dir)
-            {
-
-            case right:
-            {
-                angle -= 180;
-                setRotation(angle);
-                dir = left;
-            }
-                break;
-
-            case left:
-            {
-                angle = 0 ;
-                setRotation(angle);
-                dir = left;
-            }
-                break;
-
-            case up:
-            {
-                angle -= 90 ;
-                setRotation(angle);
-                dir = left;
-            }
-                break;
-
-            case down:
-            {
-                angle += 90 ;
-                setRotation(angle);
-                dir = left;
-            }
-                break;
-
-            }
-        }
-
-        isPushedLeft = true;
-    }
-
-}
-
-void PacMan::RightButton()
-{
-    if(GetAsyncKeyState(VK_RIGHT))
-    {
-        isPushedLeft = false;
-        isPushedUp   = false;
-        isPushedDown = false;
-
-        if (isPushedRight)
-        {
-            setPos(mapToParent(pacmanSpeed,0));
-        }
-        else
-        {
-            switch (dir)
-            {
-
-            case right:
-            {
-                angle = 0;
-                setRotation(angle);
-                dir = right;
-            }
-                break;
-
-            case left:
-            {
-                angle += 180 ;
-                setRotation(angle);
-                dir = right;
-            }
-                break;
-
-            case up:
-            {
-                angle += 90 ;
-                setRotation(angle);
-                dir = right;
-            }
-                break;
-
-            case down:
-            {
-                angle -= 90 ;
-                setRotation(angle);
-                dir = right;
-            }
-                break;
-            }
-        }
-
-        isPushedRight = true;
-    }
-
-}
-
-void PacMan::UpButton()
-{
-    if(GetAsyncKeyState(VK_UP))
-    {
-
-        isPushedLeft  = false;
-        isPushedRight = false;
-        isPushedDown  = false;
-
-        if (isPushedUp)
-        {
-            if (dir == right) setPos(mapToParent(-pacmanSpeed,0));
-            else setPos(mapToParent(pacmanSpeed,0));
-        }
-        else
-        {
-            switch (dir)
-            {
-
-            case right:
-            {
-                angle -= 90 ;
-                setRotation(angle);
-                dir = up;
-            }
-                break;
-
-            case left:
-            {
-                angle += 90 ;
-                setRotation(angle);
-                dir = up;
-            }
-                break;
-
-            case up:
-            {
-                angle = 0 ;
-                setRotation(angle);
-                dir = up;
-            }
-                break;
-
-            case down:
-            {
-                angle -= 180 ;
-                setRotation(angle);
-                dir = up;
-            }
-                break;
-            }
-        }
-
-        isPushedUp = true;
-
-    }
-
-}
-
-void PacMan::DownButton()
-{
-    if(GetAsyncKeyState(VK_DOWN))
-    {
-
-        isPushedLeft  = false;
-        isPushedRight = false;
-        isPushedUp    = false;
-
-        if (isPushedDown)
-        {
-            if (dir == right) setPos(mapToParent(-pacmanSpeed,0));
-            else setPos(mapToParent(pacmanSpeed,0));
-        }
-        else
-        {
-            switch (dir)
-            {
-
-            case right:
-            {
-                angle += 90 ;
-                setRotation(angle);
-                dir = down;
-            }
-                break;
-
-            case left:
-            {
-                angle -= 90 ;
-                setRotation(angle);
-                dir = down;
-            }
-                break;
-
-            case up:
-            {
-                angle += 180 ;
-                setRotation(angle);
-                dir = down;
-            }
-                break;
-
-            case down:
-            {
-                angle = 0 ;
-                setRotation(angle);
-                dir = down;
-            }
-                break;
-            }
-        }
-
-        isPushedDown = true;
-    }
+    if  (this->x() > 600 ) this->setX(-58);
+    if  (this->x() < -58 ) this->setX(600);
 }
 
 int PacMan::GetDir()
@@ -342,4 +184,9 @@ int PacMan::GetDir()
 void PacMan::SetPacmanSpeed(int newValue)
 {
     pacmanSpeed = newValue;
+}
+
+int PacMan::GetPacmanSpeed()
+{
+    return pacmanSpeed;
 }

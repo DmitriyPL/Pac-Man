@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sources/map1.txt</file>
+        <file>sources/pacman_beginning.wav</file>
+        <file>sources/pacman_eatfruit.wav</file>
+        <file>sources/pacman_intermission.wav</file>
+    </qresource>
+</RCC>

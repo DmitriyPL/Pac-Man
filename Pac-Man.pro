@@ -35,7 +35,8 @@ HEADERS += \
         gamefield.h \
     pacman.h \
     points.h \
-    wall.h
+    wall.h \
+    pconsts.h
 
 FORMS += \
         gamefield.ui
@@ -46,4 +47,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    sounds/sounds.qrc
+    sources.qrc
+
+DISTFILES +=

@@ -1,3 +1,4 @@
+
 #ifndef PACMAN_H
 #define PACMAN_H
 
@@ -5,8 +6,11 @@
 #include <QPainter>
 #include <QObject>
 #include <QGraphicsScene>
+#include <QKeyEvent>
+#include <QDebug>
 
-#include <windows.h>
+#include <pconsts.h>
+
 
 class PacMan : public QObject, public QGraphicsItem
 {
@@ -15,39 +19,37 @@ public:
     explicit PacMan(QObject *parent = nullptr);
     ~PacMan();
 
-    void LeftButton();
-    void RightButton();
-    void UpButton();
-    void DownButton();
-
     int GetDir();
     void SetPacmanSpeed(int newValue);
+    int  GetPacmanSpeed();
 
-signals:
-    void signalCheckItem(QGraphicsItem *item);
-
-public slots:
-    void slotGameTimer();
+//    void PacmanMoving(int x, int y, pconsts::direction currentDir);
 
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    bool eventFilter(QObject *obj, QEvent *event);
+
+signals:
+    void signalCheckItem(QGraphicsItem *item, double x, double y);
+
+public slots:
+    void slotGameTimer();
+
 
 private:
 
     int pacmanSpeed;
 
     qreal angle;
-    bool isPushedLeft, isPushedRight, isPushedUp, isPushedDown;
     int dir;
-    enum direction { left = 1, right, up, down };
 
     int agngleMouthOpening;
     int tickForMouthOpening;
     int speedMouthOpening;
 
     QList< QGraphicsItem * > foundItems;
-
 };
 
 #endif // PACMAN_H
